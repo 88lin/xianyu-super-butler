@@ -256,117 +256,280 @@ const OrderList: React.FC = () => {
 
       {/* 订单详情弹窗 */}
       {showDetailModal && selectedOrder && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm animate-fade-in p-4">
-          <div className="bg-white rounded-[2rem] p-8 max-w-2xl w-full shadow-2xl animate-slide-up flex flex-col max-h-[90vh]">
-            <div className="flex justify-between items-center mb-6 flex-shrink-0">
-              <h3 className="text-2xl font-extrabold text-gray-900">订单详情</h3>
-              <button
-                onClick={() => setShowDetailModal(false)}
-                className="p-2 rounded-xl hover:bg-gray-100 transition-colors"
-              >
-                <X className="w-5 h-5 text-gray-500" />
-              </button>
+        <div className="modal-overlay">
+          <div className="modal-container">
+            <div className="modal-header">
+              <div className="flex items-center justify-between w-full">
+                <h3 className="text-2xl font-extrabold text-gray-900">订单详情</h3>
+                <button
+                  onClick={() => setShowModal(false)}
+                  className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors"
+                >
+                  <X className="w-5 h-5 text-gray-600" />
+                </button>
+              </div>
             </div>
 
-            <div className="overflow-y-auto flex-1 space-y-6 -mr-2 pr-2">
-              {/* 商品信息 */}
-              <div className="p-4 bg-gray-50 rounded-2xl">
-                <h4 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
-                  <PackageCheck className="w-4 h-4" />
-                  商品信息
-                </h4>
-                <div className="grid grid-cols-2 gap-4 text-sm">
+            <div className="modal-body space-y-6">
+              {/* Order Info */}
+              <div className="space-y-4">
+                <h4 className="text-lg font-bold text-gray-800">订单信息</h4>
+                <div className="grid grid-cols-2 gap-4 p-4 bg-gray-50 rounded-xl">
                   <div>
-                    <span className="text-gray-500">商品标题:</span>
-                    <div className="font-medium text-gray-900 mt-1">{selectedOrder.item_title || '-'}</div>
+                    <div className="text-xs text-gray-500 mb-1">订单号</div>
+                    <div className="font-mono text-sm font-bold text-gray-900">{selectedOrder.order_id}</div>
                   </div>
                   <div>
-                    <span className="text-gray-500">商品ID:</span>
-                    <div className="font-mono text-gray-900 mt-1">{selectedOrder.item_id || '-'}</div>
+                    <div className="text-xs text-gray-500 mb-1">状态</div>
+                    <StatusBadge status={selectedOrder.status} />
                   </div>
                   <div>
-                    <span className="text-gray-500">数量:</span>
-                    <div className="font-medium text-gray-900 mt-1">{selectedOrder.quantity}</div>
+                    <div className="text-xs text-gray-500 mb-1">实付金额</div>
+                    <div className="text-lg font-extrabold text-gray-900">¥{selectedOrder.amount}</div>
                   </div>
                   <div>
-                    <span className="text-gray-500">规格:</span>
-                    <div className="font-medium text-gray-900 mt-1">{selectedOrder.spec_name || '-'}</div>
+                    <div className="text-xs text-gray-500 mb-1">数量</div>
+                    <div className="font-bold text-gray-900">{selectedOrder.quantity}</div>
                   </div>
-                </div>
-              </div>
-
-              {/* 订单信息 */}
-              <div className="p-4 bg-blue-50 rounded-2xl">
-                <h4 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
-                  <Truck className="w-4 h-4" />
-                  订单信息
-                </h4>
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <span className="text-gray-500">订单ID:</span>
-                    <div className="font-mono text-gray-900 mt-1">{selectedOrder.order_id}</div>
-                  </div>
-                  <div>
-                    <span className="text-gray-500">订单状态:</span>
-                    <div className="mt-1"><StatusBadge status={selectedOrder.status} /></div>
-                  </div>
-                  <div>
-                    <span className="text-gray-500">实付金额:</span>
-                    <div className="font-extrabold text-gray-900 mt-1">¥{selectedOrder.amount}</div>
-                  </div>
-                  <div>
-                    <span className="text-gray-500">创建时间:</span>
-                    <div className="font-medium text-gray-900 mt-1">{selectedOrder.created_at}</div>
+                  <div className="col-span-2">
+                    <div className="text-xs text-gray-500 mb-1">创建时间</div>
+                    <div className="text-sm font-medium text-gray-700">{selectedOrder.created_at}</div>
                   </div>
                 </div>
               </div>
 
-              {/* 买家信息 */}
-              <div className="p-4 bg-green-50 rounded-2xl">
-                <h4 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
-                  <UserIcon className="w-4 h-4" />
-                  买家信息
-                </h4>
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <span className="text-gray-500">买家ID:</span>
-                    <div className="font-medium text-gray-900 mt-1">{selectedOrder.buyer_id || '-'}</div>
+              {/* Item Info */}
+              <div className="space-y-4">
+                <h4 className="text-lg font-bold text-gray-800">商品信息</h4>
+                <div className="p-4 bg-gray-50 rounded-xl flex items-center gap-4">
+                  {selectedOrder.item_image && (
+                    <img src={selectedOrder.item_image} alt="" className="w-20 h-20 rounded-xl object-cover border border-gray-200" />
+                  )}
+                  <div className="flex-1">
+                    <div className="font-bold text-gray-900 mb-1">{selectedOrder.item_title || '未知商品'}</div>
+                    <div className="text-sm text-gray-500">商品ID: {selectedOrder.item_id}</div>
+                    {selectedOrder.item_price && (
+                      <div className="text-sm text-gray-500 mt-1">标价: ¥{selectedOrder.item_price}</div>
+                    )}
                   </div>
+                </div>
+              </div>
+
+              {/* Buyer Info */}
+              <div className="space-y-4">
+                <h4 className="text-lg font-bold text-gray-800">买家信息</h4>
+                <div className="p-4 bg-gray-50 rounded-xl space-y-3">
                   <div>
-                    <span className="text-gray-500">姓名:</span>
-                    <div className="font-medium text-gray-900 mt-1">{selectedOrder.buyer_name || '-'}</div>
+                    <div className="text-xs text-gray-500 mb-1">买家ID</div>
+                    <div className="font-bold text-gray-900">{selectedOrder.buyer_id}</div>
                   </div>
-                  <div>
-                    <span className="text-gray-500">手机:</span>
-                    <div className="font-medium text-gray-900 mt-1 flex items-center gap-2">
-                      {selectedOrder.buyer_phone || '-'}
-                      {selectedOrder.buyer_phone && <Copy className="w-3 h-3 cursor-pointer hover:text-black" />}
+                  {selectedOrder.receiver_name && (
+                    <div>
+                      <div className="text-xs text-gray-500 mb-1">收货人</div>
+                      <div className="font-medium text-gray-700">{selectedOrder.receiver_name}</div>
                     </div>
-                  </div>
-                  <div>
-                    <span className="text-gray-500">地址:</span>
-                    <div className="font-medium text-gray-900 mt-1">{selectedOrder.buyer_address || '-'}</div>
+                  )}
+                  {selectedOrder.receiver_phone && (
+                    <div>
+                      <div className="text-xs text-gray-500 mb-1">联系电话</div>
+                      <div className="font-mono text-sm text-gray-700">{selectedOrder.receiver_phone}</div>
+                    </div>
+                  )}
+                  {selectedOrder.receiver_address && (
+                    <div>
+                      <div className="text-xs text-gray-500 mb-1">收货地址</div>
+                      <div className="text-sm text-gray-700">{selectedOrder.receiver_address}</div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="modal-footer">
+              <div className="flex gap-3 w-full">
+                <button
+                  onClick={() => setShowDetailModal(false)}
+                  className="flex-1 px-6 py-3 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold transition-colors"
+                >
+                  关闭
+                </button>
+                {selectedOrder.status === 'pending_ship' && (
+                  <button
+                    onClick={() => {
+                      handleShip(selectedOrder.order_id);
+                      setShowDetailModal(false);
+                    }}
+                    className="flex-1 px-6 py-3 rounded-xl ios-btn-primary font-bold shadow-lg shadow-yellow-200"
+                  >
+                    立即发货
+                  </button>
+                )}
+              </div>
+            </div>
+
+      {/* Import Modal */}
+      {showImportModal && (
+        <div className="modal-overlay">
+          <div className="modal-container">
+            <div className="modal-header">
+              <div className="flex items-center justify-between w-full">
+                <h3 className="text-2xl font-extrabold text-gray-900">插入订单</h3>
+                <button
+                  onClick={() => setShowModal(false)}
+                  className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors"
+                >
+                  <X className="w-5 h-5 text-gray-600" />
+                </button>
+              </div>
+            </div>
+
+            <div className="modal-body space-y-5">
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-2">选择Excel文件</label>
+                <input
+                  type="file"
+                  accept=".xlsx,.xls"
+                  onChange={(e) => setImportFile(e.target.files?.[0] || null)}
+                  className="w-full ios-input px-4 py-3 rounded-xl text-sm"
+                />
+                <p className="text-xs text-gray-500 mt-2">支持 .xlsx 和 .xls 格式</p>
+              </div>
+
+              {importFile && (
+                <div className="p-3 bg-blue-50 rounded-xl">
+                  <div className="flex items-center gap-2">
+                    <Upload className="w-4 h-4 text-blue-600" />
+                    <span className="text-sm font-medium text-blue-900">{importFile.name}</span>
                   </div>
                 </div>
+              </div>
+
+            <div className="modal-footer">
+              <div className="flex gap-3 w-full">
+                <button
+                  onClick={() => setShowImportModal(false)}
+                  className="flex-1 px-6 py-3 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold transition-colors"
+                >
+                  取消
+                </button>
+                <button
+                  onClick={handleImport}
+                  disabled={!importFile}
+                  className="flex-1 px-6 py-3 rounded-xl ios-btn-primary font-bold shadow-lg shadow-yellow-200 disabled:opacity-50"
+                >
+                  导入订单
+                </button>
               </div>
             </div>
           </div>
         </div>
       )}
 
-      {/* 编辑订单弹窗 */}
-      {showEditModal && selectedOrder && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm animate-fade-in p-4">
-          <div className="bg-white rounded-[2rem] p-8 max-w-2xl w-full shadow-2xl animate-slide-up flex flex-col max-h-[90vh]">
-            <div className="flex justify-between items-center mb-6 flex-shrink-0">
-              <h3 className="text-2xl font-extrabold text-gray-900">编辑订单</h3>
-              <button
-                onClick={() => setShowEditModal(false)}
-                className="p-2 rounded-xl hover:bg-gray-100 transition-colors"
-              >
-                <X className="w-5 h-5 text-gray-500" />
-              </button>
+      {/* Edit Modal */}
+      {showEditModal && editingOrder && (
+        <div className="modal-overlay">
+          <div className="modal-container">
+            <div className="modal-header">
+              <div className="flex items-center justify-between w-full">
+                <h3 className="text-2xl font-extrabold text-gray-900">编辑订单</h3>
+                <button
+                  onClick={() => setShowEditModal(false)}
+                  className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors"
+                >
+                  <X className="w-5 h-5 text-gray-600" />
+                </button>
+              </div>
             </div>
+
+            <div className="modal-body space-y-5">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">订单号</label>
+                  <input
+                    type="text"
+                    value={editingOrder.order_id}
+                    disabled
+                    className="w-full ios-input px-4 py-3 rounded-xl bg-gray-50 text-gray-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">订单状态</label>
+                  <select
+                    value={editingOrder.status}
+                    onChange={(e) => setEditingOrder({ ...editingOrder, status: e.target.value as OrderStatus })}
+                    className="w-full ios-input px-4 py-3 rounded-xl"
+                  >
+                    <option value="processing">处理中</option>
+                    <option value="pending_ship">待发货</option>
+                    <option value="shipped">已发货</option>
+                    <option value="completed">已完成</option>
+                    <option value="cancelled">已取消</option>
+                    <option value="refunding">退款中</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">买家ID</label>
+                  <input
+                    type="text"
+                    value={editingOrder.buyer_id}
+                    onChange={(e) => setEditingOrder({ ...editingOrder, buyer_id: e.target.value })}
+                    className="w-full ios-input px-4 py-3 rounded-xl"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">实付金额</label>
+                  <input
+                    type="number"
+                    value={editingOrder.amount}
+                    onChange={(e) => setEditingOrder({ ...editingOrder, amount: parseFloat(e.target.value) })}
+                    className="w-full ios-input px-4 py-3 rounded-xl"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">收货人</label>
+                  <input
+                    type="text"
+                    value={editingOrder.receiver_name || ''}
+                    onChange={(e) => setEditingOrder({ ...editingOrder, receiver_name: e.target.value })}
+                    className="w-full ios-input px-4 py-3 rounded-xl"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">联系电话</label>
+                  <input
+                    type="text"
+                    value={editingOrder.receiver_phone || ''}
+                    onChange={(e) => setEditingOrder({ ...editingOrder, receiver_phone: e.target.value })}
+                    className="w-full ios-input px-4 py-3 rounded-xl"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-2">收货地址</label>
+                <textarea
+                  value={editingOrder.receiver_address || ''}
+                  onChange={(e) => setEditingOrder({ ...editingOrder, receiver_address: e.target.value })}
+                  rows={2}
+                  className="w-full ios-input px-4 py-3 rounded-xl resize-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-2">商品标题</label>
+                <input
+                  type="text"
+                  value={editingOrder.item_title || ''}
+                  onChange={(e) => setEditingOrder({ ...editingOrder, item_title: e.target.value })}
+                  className="w-full ios-input px-4 py-3 rounded-xl"
+                />
+              </div>
 
             <div className="overflow-y-auto flex-1 -mr-2 pr-2 space-y-4">
               <div className="grid grid-cols-2 gap-4">
@@ -518,36 +681,21 @@ const OrderList: React.FC = () => {
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto -mr-2 pr-2">
-              <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">订单数据 (JSON格式)</label>
-                <textarea
-                  value={importText}
-                  onChange={(e) => setImportText(e.target.value)}
-                  placeholder='[{"order_id": "123", "item_title": "商品", "buyer_id": "user123", "amount": 99.99, ...}]'
-                  className="w-full ios-input px-4 py-3 rounded-xl h-48 resize-none font-mono text-sm"
-                />
-                <p className="text-xs text-gray-500 mt-2">
-                  支持单个订单对象或订单数组，JSON格式
-                </p>
-              </div>
-
-              <div className="flex gap-3 pt-4">
+            <div className="modal-footer">
+              <div className="flex gap-3 w-full">
                 <button
-                  onClick={() => setShowImportModal(false)}
-                  className="flex-1 px-6 py-3 rounded-xl font-bold bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
+                  onClick={() => setShowEditModal(false)}
+                  className="flex-1 px-6 py-3 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold transition-colors"
                 >
                   取消
                 </button>
                 <button
-                  onClick={handleImportOrders}
-                  className="flex-1 ios-btn-primary px-6 py-3 rounded-xl font-bold flex items-center justify-center gap-2"
+                  onClick={handleSaveEdit}
+                  className="flex-1 px-6 py-3 rounded-xl ios-btn-primary font-bold shadow-lg shadow-yellow-200 flex items-center justify-center gap-2"
                 >
-                  <Plus className="w-4 h-4" />
-                  导入订单
+                  <Save className="w-5 h-5" />
+                  保存修改
                 </button>
-                </div>
               </div>
             </div>
           </div>

@@ -223,116 +223,96 @@ const ItemList: React.FC = () => {
           )}
       </div>
 
-      {/* 编辑商品弹窗 */}
-      {showEditModal && selectedItem && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm animate-fade-in p-4">
-          <div className="bg-white rounded-[2rem] p-8 max-w-lg w-full shadow-2xl animate-slide-up flex flex-col max-h-[90vh]">
-            <div className="flex justify-between items-center mb-6 flex-shrink-0">
-              <h3 className="text-2xl font-extrabold text-gray-900">编辑商品</h3>
-              <button
-                onClick={() => setShowEditModal(false)}
-                className="p-2 rounded-xl hover:bg-gray-100 transition-colors"
-              >
-                <X className="w-5 h-5 text-gray-500" />
-              </button>
-            </div>
-
-            <div className="flex-1 overflow-y-auto -mr-2 pr-2">
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-2">商品标题</label>
-                  <input
-                    type="text"
-                    value={editForm.item_title || ''}
-                    onChange={(e) => setEditForm({ ...editForm, item_title: e.target.value })}
-                    className="w-full ios-input px-4 py-3 rounded-xl"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-2">商品ID</label>
-                  <input
-                    type="text"
-                    value={editForm.item_id || ''}
-                    onChange={(e) => setEditForm({ ...editForm, item_id: e.target.value })}
-                    className="w-full ios-input px-4 py-3 rounded-xl font-mono text-sm"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-2">价格</label>
-                  <input
-                    type="text"
-                    value={editForm.item_price || ''}
-                    onChange={(e) => setEditForm({ ...editForm, item_price: e.target.value })}
-                    className="w-full ios-input px-4 py-3 rounded-xl"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-2">图片URL</label>
-                  <input
-                    type="text"
-                    value={editForm.item_image || ''}
-                    onChange={(e) => setEditForm({ ...editForm, item_image: e.target.value })}
-                    className="w-full ios-input px-4 py-3 rounded-xl font-mono text-sm"
-                  />
-                </div>
-
-                <div className="flex gap-4">
-                  <button
-                    type="button"
-                    onClick={() => setEditForm({ ...editForm, is_multi_spec: !editForm.is_multi_spec })}
-                    className={`flex-1 p-4 rounded-xl font-bold transition-all ${
-                      editForm.is_multi_spec ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600'
-                    }`}
-                  >
-                    多规格: {editForm.is_multi_spec ? '开' : '关'}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setEditForm({ ...editForm, is_multi_qty_ship: !editForm.is_multi_qty_ship })}
-                    className={`flex-1 p-4 rounded-xl font-bold transition-all ${
-                      editForm.is_multi_qty_ship ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
-                    }`}
-                  >
-                    多数量发货: {editForm.is_multi_qty_ship ? '开' : '关'}
-                  </button>
-                </div>
-
-                <div className="flex gap-3 pt-4">
-                  <button
-                    onClick={() => setShowEditModal(false)}
-                    className="flex-1 px-6 py-3 rounded-xl font-bold bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
-                  >
-                    取消
-                  </button>
-                  <button
-                    onClick={handleSaveEdit}
-                    className="flex-1 ios-btn-primary px-6 py-3 rounded-xl font-bold flex items-center justify-center gap-2"
-                  >
-                    <Save className="w-4 h-4" />
-                    保存更改
-                  </button>
-                </div>
+      {/* Add/Edit Modal */}
+      {showModal && (
+        <div className="modal-overlay">
+          <div className="modal-container">
+            <div className="modal-header">
+              <div className="flex items-center justify-between w-full">
+                <h3 className="text-2xl font-extrabold text-gray-900">
+                  {editingItem ? '编辑商品' : '新增商品'}
+                </h3>
+                <button
+                  onClick={() => setShowModal(false)}
+                  className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors"
+                >
+                  <X className="w-5 h-5 text-gray-600" />
+                </button>
               </div>
             </div>
-          </div>
-        </div>
-      )}
 
-      {/* 添加商品弹窗 */}
-      {showAddModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm animate-fade-in p-4">
-          <div className="bg-white rounded-[2rem] p-8 max-w-lg w-full shadow-2xl animate-slide-up flex flex-col max-h-[90vh]">
-            <div className="flex justify-between items-center mb-6 flex-shrink-0">
-              <h3 className="text-2xl font-extrabold text-gray-900">添加新商品</h3>
-              <button
-                onClick={() => setShowAddModal(false)}
-                className="p-2 rounded-xl hover:bg-gray-100 transition-colors"
-              >
-                <X className="w-5 h-5 text-gray-500" />
-              </button>
+            <div className="modal-body space-y-5">
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-2">商品标题</label>
+                <input
+                  type="text"
+                  value={form.item_title}
+                  onChange={(e) => setForm({ ...form, item_title: e.target.value })}
+                  placeholder="例如：苹果手机 iPhone 13"
+                  className="w-full ios-input px-4 py-3 rounded-xl"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-2">商品价格</label>
+                <input
+                  type="number"
+                  value={form.item_price}
+                  onChange={(e) => setForm({ ...form, item_price: parseFloat(e.target.value) || 0 })}
+                  placeholder="0.00"
+                  className="w-full ios-input px-4 py-3 rounded-xl"
+                  step="0.01"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-2">商品图片 URL</label>
+                <input
+                  type="text"
+                  value={form.item_image}
+                  onChange={(e) => setForm({ ...form, item_image: e.target.value })}
+                  placeholder="https://example.com/image.jpg"
+                  className="w-full ios-input px-4 py-3 rounded-xl"
+                />
+              </div>
+
+              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                <div>
+                  <div className="font-bold text-gray-900">多规格商品</div>
+                  <div className="text-xs text-gray-500 mt-1">是否存在多个规格选项</div>
+                </div>
+                <button
+                  onClick={() => setForm({ ...form, is_multi_spec: !form.is_multi_spec })}
+                  className={`w-14 h-8 rounded-full transition-all relative ${
+                    form.is_multi_spec ? 'bg-[#FFE815]' : 'bg-gray-300'
+                  }`}
+                >
+                  <div
+                    className={`w-6 h-6 bg-white rounded-full absolute top-1 transition-all shadow-md ${
+                      form.is_multi_spec ? 'left-7' : 'left-1'
+                    }`}
+                  />
+                </button>
+              </div>
+            </div>
+            </div>
+
+            <div className="modal-footer">
+              <div className="flex gap-3 w-full">
+                <button
+                  onClick={() => setShowModal(false)}
+                  className="flex-1 px-6 py-3 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold transition-colors"
+                >
+                  取消
+                </button>
+                <button
+                  onClick={handleSave}
+                  className="flex-1 px-6 py-3 rounded-xl ios-btn-primary font-bold shadow-lg shadow-yellow-200 flex items-center justify-center gap-2"
+                >
+                  <Save className="w-5 h-5" />
+                  保存商品
+                </button>
+              </div>
             </div>
 
             <div className="flex-1 overflow-y-auto -mr-2 pr-2">

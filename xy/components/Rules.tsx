@@ -282,20 +282,110 @@ const Rules: React.FC = () => {
           )}
       </div>
 
-      {/* 发货规则弹窗 */}
-      {showShippingModal && editingShippingRule && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm animate-fade-in p-4">
-          <div className="bg-white rounded-[2rem] p-8 max-w-lg w-full shadow-2xl animate-slide-up flex flex-col max-h-[90vh]">
-            <div className="flex justify-between items-center mb-6 flex-shrink-0">
-              <h3 className="text-2xl font-extrabold text-gray-900">
-                {editingShippingRule.id ? '编辑发货规则' : '新增发货规则'}
-              </h3>
-              <button
-                onClick={() => setShowShippingModal(false)}
-                className="p-2 rounded-xl hover:bg-gray-100 transition-colors"
-              >
-                <X className="w-5 h-5 text-gray-500" />
-              </button>
+      {/* Shipping Rule Modal */}
+      {showShippingModal && (
+        <div className="modal-overlay">
+          <div className="modal-container">
+            <div className="modal-header">
+              <div className="flex items-center justify-between w-full">
+                <h3 className="text-2xl font-extrabold text-gray-900">
+              {editingShippingRule ? '编辑发货规则' : '新增发货规则'}
+            </h3>
+                <button
+                  onClick={() => setShowModal(false)}
+                  className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors"
+                >
+                  <X className="w-5 h-5 text-gray-600" />
+                </button>
+              </div>
+            </div>
+
+            <div className="modal-body space-y-5">
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-2">规则名称</label>
+                <input
+                  type="text"
+                  value={shippingForm.name}
+                  onChange={(e) => setShippingForm({ ...shippingForm, name: e.target.value })}
+                  placeholder="例如：会员月卡自动发货"
+                  className="w-full ios-input px-4 py-3 rounded-xl"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-2">商品关键词</label>
+                <input
+                  type="text"
+                  value={shippingForm.item_keyword}
+                  onChange={(e) => setShippingForm({ ...shippingForm, item_keyword: e.target.value })}
+                  placeholder="商品标题包含此关键词时触发"
+                  className="w-full ios-input px-4 py-3 rounded-xl"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-2">关联卡券</label>
+                <select
+                  value={shippingForm.card_group_id}
+                  onChange={(e) => setShippingForm({ ...shippingForm, card_group_id: parseInt(e.target.value) })}
+                  className="w-full ios-input px-4 py-3 rounded-xl"
+                >
+                  <option value={0}>选择卡券组</option>
+                  {cards.map(card => (
+                    <option key={card.id} value={card.id}>{card.name}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-2">发货数量</label>
+                <input
+                  type="number"
+                  value={shippingForm.priority}
+                  onChange={(e) => setShippingForm({ ...shippingForm, priority: parseInt(e.target.value) || 1 })}
+                  placeholder="每次发送的卡密数量"
+                  className="w-full ios-input px-4 py-3 rounded-xl"
+                  min="1"
+                />
+              </div>
+
+              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                <div>
+                  <div className="font-bold text-gray-900">启用规则</div>
+                  <div className="text-xs text-gray-500 mt-1">禁用后将不会自动发货</div>
+                </div>
+                <button
+                  onClick={() => setShippingForm({ ...shippingForm, enabled: !shippingForm.enabled })}
+                  className={`w-14 h-8 rounded-full transition-all relative ${
+                    shippingForm.enabled ? 'bg-[#FFE815]' : 'bg-gray-300'
+                  }`}
+                >
+                  <div
+                    className={`w-6 h-6 bg-white rounded-full absolute top-1 transition-all shadow-md ${
+                      shippingForm.enabled ? 'left-7' : 'left-1'
+                    }`}
+                  />
+                </button>
+              </div>
+            </div>
+            </div>
+
+            <div className="modal-footer">
+              <div className="flex gap-3 w-full">
+                <button
+                  onClick={() => setShowShippingModal(false)}
+                  className="flex-1 px-6 py-3 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold transition-colors"
+                >
+                  取消
+                </button>
+                <button
+                  onClick={handleSaveShipping}
+                  className="flex-1 px-6 py-3 rounded-xl ios-btn-primary font-bold shadow-lg shadow-yellow-200 flex items-center justify-center gap-2"
+                >
+                  <Save className="w-5 h-5" />
+                  保存规则
+                </button>
+              </div>
             </div>
 
             <div className="flex-1 overflow-y-auto -mr-2 pr-2">
@@ -383,20 +473,110 @@ const Rules: React.FC = () => {
         </div>
       )}
 
-      {/* 回复规则弹窗 */}
-      {showReplyModal && editingReplyRule && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm animate-fade-in p-4">
-          <div className="bg-white rounded-[2rem] p-8 max-w-lg w-full shadow-2xl animate-slide-up flex flex-col max-h-[90vh]">
-            <div className="flex justify-between items-center mb-6 flex-shrink-0">
-              <h3 className="text-2xl font-extrabold text-gray-900">
-                {editingReplyRule.id ? '编辑回复规则' : '新增回复规则'}
-              </h3>
-              <button
-                onClick={() => setShowReplyModal(false)}
-                className="p-2 rounded-xl hover:bg-gray-100 transition-colors"
-              >
-                <X className="w-5 h-5 text-gray-500" />
-              </button>
+      {/* Reply Rule Modal */}
+      {showReplyModal && (
+        <div className="modal-overlay">
+          <div className="modal-container">
+            <div className="modal-header">
+              <div className="flex items-center justify-between w-full">
+                <h3 className="text-2xl font-extrabold text-gray-900">
+              {editingReplyRule ? '编辑回复规则' : '新增回复规则'}
+            </h3>
+                <button
+                  onClick={() => setShowModal(false)}
+                  className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors"
+                >
+                  <X className="w-5 h-5 text-gray-600" />
+                </button>
+              </div>
+            </div>
+
+            <div className="modal-body space-y-5">
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-2">触发关键词</label>
+                <input
+                  type="text"
+                  value={replyForm.keyword}
+                  onChange={(e) => setReplyForm({ ...replyForm, keyword: e.target.value })}
+                  placeholder="例如：在吗、价格"
+                  className="w-full ios-input px-4 py-3 rounded-xl"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-2">回复内容</label>
+                <textarea
+                  value={replyForm.reply_content}
+                  onChange={(e) => setReplyForm({ ...replyForm, reply_content: e.target.value })}
+                  placeholder="买家发送关键词后，自动回复的内容..."
+                  rows={4}
+                  className="w-full ios-input px-4 py-3 rounded-xl resize-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-2">匹配模式</label>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    onClick={() => setReplyForm({ ...replyForm, match_type: 'exact' })}
+                    className={`flex flex-col items-center gap-2 p-3 rounded-xl font-bold text-sm transition-all ${
+                      replyForm.match_type === 'exact'
+                        ? 'bg-[#FFE815] text-black'
+                        : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
+                    }`}
+                  >
+                    精确匹配
+                  </button>
+                  <button
+                    onClick={() => setReplyForm({ ...replyForm, match_type: 'fuzzy' })}
+                    className={`flex flex-col items-center gap-2 p-3 rounded-xl font-bold text-sm transition-all ${
+                      replyForm.match_type === 'fuzzy'
+                        ? 'bg-[#FFE815] text-black'
+                        : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
+                    }`}
+                  >
+                    模糊包含
+                  </button>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                <div>
+                  <div className="font-bold text-gray-900">启用规则</div>
+                  <div className="text-xs text-gray-500 mt-1">禁用后将不会自动回复</div>
+                </div>
+                <button
+                  onClick={() => setReplyForm({ ...replyForm, enabled: !replyForm.enabled })}
+                  className={`w-14 h-8 rounded-full transition-all relative ${
+                    replyForm.enabled ? 'bg-[#FFE815]' : 'bg-gray-300'
+                  }`}
+                >
+                  <div
+                    className={`w-6 h-6 bg-white rounded-full absolute top-1 transition-all shadow-md ${
+                      replyForm.enabled ? 'left-7' : 'left-1'
+                    }`}
+                  />
+                </button>
+              </div>
+            </div>
+            </div>
+
+            <div className="modal-footer">
+              <div className="flex gap-3 w-full">
+                <button
+                  onClick={() => setShowReplyModal(false)}
+                  className="flex-1 px-6 py-3 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold transition-colors"
+                >
+                  取消
+                </button>
+                <button
+                  onClick={handleSaveReply}
+                  className="flex-1 px-6 py-3 rounded-xl ios-btn-primary font-bold shadow-lg shadow-yellow-200 flex items-center justify-center gap-2"
+                >
+                  <Save className="w-5 h-5" />
+                  保存规则
+                </button>
+              </div>
             </div>
 
             <div className="flex-1 overflow-y-auto -mr-2 pr-2">
